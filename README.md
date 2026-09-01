@@ -12,12 +12,14 @@
 
 | Платформа | Файл |
 |---|---|
-| macOS, Apple Silicon | `Seatkey-<версия>-arm64.dmg` |
-| macOS, Intel | `Seatkey-<версия>.dmg` |
-| Windows | `Seatkey Setup <версия>.exe` |
-| Linux | `Seatkey-<версия>.AppImage`, `.deb` |
+| macOS, Apple Silicon | `Seatkey-<версия>-arm64-mac.zip` |
 
-Файлы `-mac.zip` и `.blockmap` качать не нужно: их берёт автообновление.
+Распакуйте архив и перенесите `Seatkey.app` в «Программы».
+
+Файлы `.blockmap` качать не нужно: они служебные, их берёт автообновление.
+
+Сборок под Windows, Linux и Intel-Маки пока нет — приложение собирается
+только под Apple Silicon. Появятся — встанут в эту же таблицу.
 
 ## Первый запуск
 
@@ -31,6 +33,12 @@ Gatekeeper такой сертификат не признаёт, поэтому
 
 Начиная с macOS 15 правый клик Gatekeeper больше не обходит — Apple убрала
 этот путь.
+
+Кому ближе терминал — то же самое одной командой:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Seatkey.app
+```
 
 ## Обновления
 
