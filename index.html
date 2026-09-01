@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Seatkey — подписка на Claude Code как обычный OpenAI-адрес</title>
 <meta name="description" content="Seatkey превращает вашу подписку на Claude Code, Codex CLI или Cursor Agent в локальный OpenAI-совместимый адрес. Вставьте его в Obsidian, Open WebUI или свой скрипт — без API-ключей и второго счёта.">
-<meta property="og:title" content="Seatkey — пусть подписка работает не только в терминале">
+<meta property="og:title" content="Seatkey — пусть подписка работает не только в чате">
 <meta property="og:description" content="Локальный OpenAI-адрес поверх Claude Code, Codex CLI и Cursor Agent. Одно приложение — один адрес. Без API-ключей, без облака.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ilyabazhenov.github.io/seatkey-releases/">
@@ -57,7 +57,7 @@
   .kicker::after { content: ""; height: 1px; flex: 1; background: var(--line); }
   .kicker b { color: var(--accent); font-weight: 500; }
 
-  h1 { font-size: clamp(2.05rem, 3vw, 2.9rem); line-height: 1.07; }
+  h1 { font-size: clamp(1.95rem, 2.8vw, 2.65rem); line-height: 1.09; }
   h2 { font-size: clamp(1.75rem, 3.4vw, 2.7rem); line-height: 1.08; }
   h3 { font-size: 1.14rem; line-height: 1.35; }
   .big { font-size: clamp(1.35rem, 2.1vw, 1.6rem); line-height: 1.45; color: var(--dim); font-weight: 400; }
@@ -105,7 +105,7 @@
   /* Левая колонка стоит на общей сетке страницы, правая уезжает в край экрана:
      снимок читается как продолжение окна, а не как картинка в колонке. */
   .hero > .wrap { max-width: none; padding-right: 0; padding-left: max(var(--pad), calc((100vw - 1280px) / 2 + var(--pad))); }
-  .hero-grid { display: grid; grid-template-columns: minmax(0, 540px) minmax(0, 1fr); gap: clamp(32px, 5vw, 68px); align-items: center; }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 640px) minmax(0, 1fr); gap: clamp(32px, 5vw, 60px); align-items: center; }
   .hero h1 { margin: 22px 0 0; }
   .hero h1 .soft { color: var(--muted); }
   .hero .big { margin: 22px 0 0; max-width: 26em; font-size: clamp(1.12rem, 1.5vw, 1.3rem); }
@@ -288,10 +288,10 @@
   <div class="wrap hero-grid">
     <div>
       <p class="kicker"><b>Seatkey</b> локальный шлюз · macOS</p>
-      <h1>Вы уже платите<br>за Claude&nbsp;Code.<br><span class="soft">Пусть он работает не только в терминале.</span></h1>
+      <h1>Вы уже платите за<br>Claude&nbsp;Code, Codex или Cursor.<br><span class="soft">Пусть он работает<br>не только в чате.</span></h1>
       <p class="big">
-        Seatkey превращает вашу подписку на Claude Code, Codex CLI или Cursor Agent
-        в обычный OpenAI-адрес на вашем компьютере. Вставьте его в Obsidian,
+        Seatkey поднимает на вашем компьютере обычный OpenAI-адрес, а за ним стоит
+        тот самый агент, за которого вы уже платите. Вставьте адрес в Obsidian,
         Open WebUI или свой скрипт — и они заработают.
       </p>
       <div class="hero-cta">
