@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seatkey — подписка на Claude Code как обычный OpenAI-адрес</title>
+<meta name="description" content="Seatkey превращает вашу подписку на Claude Code, Codex CLI или Cursor Agent в локальный OpenAI-совместимый адрес. Вставьте его в Obsidian, Open WebUI или свой скрипт — без API-ключей и второго счёта.">
+<meta property="og:title" content="Seatkey — пусть подписка работает не только в терминале">
+<meta property="og:description" content="Локальный OpenAI-адрес поверх Claude Code, Codex CLI и Cursor Agent. Одно приложение — один адрес. Без API-ключей, без облака.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ilyabazhenov.github.io/seatkey-releases/">
+<meta property="og:image" content="https://ilyabazhenov.github.io/seatkey-releases/shots/app-endpoints.png">
+<meta name="theme-color" content="#08090b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024'%3E%3Cdefs%3E%3ClinearGradient id='p' gradientUnits='userSpaceOnUse' x1='512' y1='0' x2='512' y2='1024'%3E%3Cstop offset='0' stop-color='%236890FF'/%3E%3Cstop offset='1' stop-color='%232246BE'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1024' height='1024' rx='229' fill='url(%23p)'/%3E%3Ccircle cx='512' cy='368' r='196' fill='%23fff'/%3E%3Cpath d='M402 466 L330 812 Q323 852 364 852 L660 852 Q701 852 694 812 L622 466 Z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #08090b;
+    --bg-2: #0c0e12;
+    --panel: #101318;
+    --line: rgba(255,255,255,.085);
+    --line-2: rgba(255,255,255,.16);
+    --fg: #eceef2;
+    --dim: #a2aab8;
+    --muted: #79818f;
+    --accent: #5b8cff;
+    --ok: #3ecf8e;
+    --warn: #e0a33a;
+    --sans: "Onest", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --pad: clamp(20px, 5vw, 56px);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font-family: var(--sans); font-size: 17px; line-height: 1.62; font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: rgba(91,140,255,.32); }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; height: auto; }
+  h1, h2, h3 { font-weight: 600; letter-spacing: -.028em; margin: 0; }
+
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 0 var(--pad); }
+
+  /* ── служебная типографика ─────────────────────────────────────────── */
+  .kicker {
+    font-family: var(--mono); font-size: 12px; font-weight: 500;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+    display: flex; align-items: center; gap: 14px;
+  }
+  .kicker::after { content: ""; height: 1px; flex: 1; background: var(--line); }
+  .kicker b { color: var(--accent); font-weight: 500; }
+
+  h1 { font-size: clamp(2.05rem, 3vw, 2.9rem); line-height: 1.07; }
+  h2 { font-size: clamp(1.75rem, 3.4vw, 2.7rem); line-height: 1.08; }
+  h3 { font-size: 1.14rem; line-height: 1.35; }
+  .big { font-size: clamp(1.35rem, 2.1vw, 1.6rem); line-height: 1.45; color: var(--dim); font-weight: 400; }
+  .dim { color: var(--dim); }
+  .muted { color: var(--muted); }
+  .mono { font-family: var(--mono); }
+  code {
+    font-family: var(--mono); font-size: .88em;
+    background: rgba(255,255,255,.055); border: 1px solid var(--line);
+    padding: .1em .4em; border-radius: 5px;
+  }
+
+  /* ── кнопки ────────────────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex; align-items: center; gap: .6em; cursor: pointer;
+    font-family: inherit; font-size: 1rem; font-weight: 500; line-height: 1;
+    padding: 1em 1.5em; border-radius: 10px; border: 1px solid transparent;
+    background: var(--fg); color: #0a0b0d;
+    transition: transform .14s ease, background .14s ease, border-color .14s ease;
+  }
+  .btn:hover { transform: translateY(-1px); background: #fff; }
+  .btn.ghost { background: transparent; color: var(--fg); border-color: var(--line-2); }
+  .btn.ghost:hover { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.3); }
+  .btn.sm { padding: .68em 1.05em; font-size: .9rem; border-radius: 8px; }
+
+  /* ── шапка ─────────────────────────────────────────────────────────── */
+  header.top {
+    position: sticky; top: 0; z-index: 40;
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    backdrop-filter: blur(14px) saturate(160%);
+    border-bottom: 1px solid transparent; transition: border-color .2s ease;
+  }
+  header.top.stuck { border-bottom-color: var(--line); }
+  .top-in { display: flex; align-items: center; justify-content: space-between; height: 66px; gap: 20px; }
+  .mark { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -.02em; font-size: 1.06rem; }
+  .top-nav { display: flex; align-items: center; gap: 28px; }
+  .top-nav a { color: var(--dim); font-size: .95rem; }
+  .top-nav a:hover { color: var(--fg); }
+  /* Кнопка в шапке — тоже ссылка, и правило выше перебивало её цвет. */
+  .top-nav a.btn { color: #0a0b0d; }
+  @media (max-width: 780px) { .top-nav a:not(.btn) { display: none; } }
+
+  /* ── герой ─────────────────────────────────────────────────────────── */
+  .hero { padding: clamp(36px, 4.5vw, 56px) 0 clamp(20px, 4vw, 44px); overflow: hidden; }
+  /* Левая колонка стоит на общей сетке страницы, правая уезжает в край экрана:
+     снимок читается как продолжение окна, а не как картинка в колонке. */
+  .hero > .wrap { max-width: none; padding-right: 0; padding-left: max(var(--pad), calc((100vw - 1280px) / 2 + var(--pad))); }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 540px) minmax(0, 1fr); gap: clamp(32px, 5vw, 68px); align-items: center; }
+  .hero h1 { margin: 22px 0 0; }
+  .hero h1 .soft { color: var(--muted); }
+  .hero .big { margin: 22px 0 0; max-width: 26em; font-size: clamp(1.12rem, 1.5vw, 1.3rem); }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+  .hero-fine { margin-top: 20px; font-size: .9rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 20px; }
+  .hero-fine span { display: inline-flex; align-items: center; gap: 8px; }
+  .led { width: 6px; height: 6px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px rgba(62,207,142,.16); }
+
+  /* Снимок уезжает за правый край страницы: так он читается как продолжение
+     экрана, а не как картинка, аккуратно уложенная в колонку. */
+  .shot { position: relative; }
+  .shot img {
+    width: min(1120px, 158%); max-width: none; border-radius: 12px; border: 1px solid var(--line-2);
+    box-shadow: 0 40px 120px -30px rgba(0,0,0,.9), 0 2px 0 rgba(255,255,255,.05) inset;
+  }
+  @media (max-width: 960px) {
+    .hero > .wrap { max-width: 1280px; padding-right: var(--pad); padding-left: var(--pad); }
+    .hero-grid { grid-template-columns: 1fr; }
+    .shot img { width: 100%; max-width: 100%; }
+  }
+
+  /* ── секции ────────────────────────────────────────────────────────── */
+  section { padding: clamp(72px, 11vw, 132px) 0; }
+  section + section { border-top: 1px solid var(--line); }
+  .lead { max-width: 46ch; }
+  .head { display: grid; gap: 22px; margin-bottom: clamp(40px, 6vw, 64px); }
+
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 5vw, 72px); }
+  @media (max-width: 860px) { .two { grid-template-columns: 1fr; gap: 34px; } }
+  .col-label { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding-bottom: 14px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+  .col-label.on { color: var(--accent); border-color: rgba(91,140,255,.4); }
+  .col p { margin: 0 0 1em; color: var(--dim); }
+  .col p:last-child { margin-bottom: 0; }
+  .col strong { color: var(--fg); font-weight: 500; }
+
+  figure { margin: 0; }
+  /* Журнал уезжает в левый край — зеркально герою: страница держит ритм,
+     а снимок остаётся достаточно крупным, чтобы в нём читались строки. */
+  #log > .wrap { max-width: none; padding-left: 0; padding-right: max(var(--pad), calc((100vw - 1280px) / 2 + var(--pad))); }
+  #log .two { grid-template-columns: minmax(0, 1fr) minmax(0, 480px); align-items: center; }
+  #log .log-shot { display: flex; flex-direction: column; align-items: flex-end; }
+  #log .log-shot img { width: min(1120px, 152%); max-width: none; }
+  #log figcaption { align-self: flex-end; }
+  @media (max-width: 960px) {
+    #log > .wrap { max-width: 1280px; padding-left: var(--pad); padding-right: var(--pad); }
+    #log .two { grid-template-columns: 1fr; }
+    #log .log-shot img { width: 100%; max-width: 100%; }
+    #log figcaption { align-self: flex-start; }
+  }
+  figure img { border-radius: 12px; border: 1px solid var(--line-2); box-shadow: 0 40px 100px -40px rgba(0,0,0,.9); }
+  figcaption { margin-top: 14px; font-size: .84rem; color: var(--muted); font-family: var(--mono); }
+
+  .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin-top: 44px; }
+  @media (max-width: 780px) { .facts { grid-template-columns: 1fr; } }
+  .fact { background: var(--bg-2); padding: 26px 24px; }
+  .fact .n { font-family: var(--mono); font-size: clamp(1.7rem, 3vw, 2.2rem); font-weight: 500; letter-spacing: -.02em; }
+  .fact .n small { font-size: .5em; color: var(--muted); font-weight: 400; margin-left: .4em; letter-spacing: 0; }
+  .fact p { margin: 10px 0 0; font-size: .95rem; color: var(--muted); line-height: 1.5; }
+</style>
+</head>
+<body>
+<style>
+  /* ── коннектор ─────────────────────────────────────────────────────── */
+  .connector { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--bg-2); }
+  .tabs { display: flex; overflow-x: auto; border-bottom: 1px solid var(--line); scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs button {
+    flex: none; font-family: inherit; font-size: .95rem; font-weight: 500; color: var(--muted);
+    background: none; border: 0; border-bottom: 2px solid transparent; cursor: pointer;
+    padding: 16px 20px; white-space: nowrap; transition: color .14s ease, border-color .14s ease;
+  }
+  .tabs button:hover { color: var(--dim); }
+  .tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+  .panel { padding: clamp(22px, 3.4vw, 34px); display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(24px, 4vw, 48px); }
+  @media (max-width: 860px) { .panel { grid-template-columns: 1fr; } }
+  .field + .field { margin-top: 18px; }
+  .field label { display: block; font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .field .val {
+    display: flex; align-items: center; gap: 10px; background: var(--bg);
+    border: 1px solid var(--line); border-radius: 9px; padding: 12px 14px;
+  }
+  .field .val span { font-family: var(--mono); font-size: .92rem; overflow-x: auto; white-space: nowrap; flex: 1; scrollbar-width: none; }
+  .field .val span::-webkit-scrollbar { display: none; }
+  .copy {
+    flex: none; background: none; border: 1px solid var(--line); color: var(--muted);
+    border-radius: 7px; padding: 5px 9px; cursor: pointer; font-family: var(--mono); font-size: 11px;
+    transition: color .14s ease, border-color .14s ease;
+  }
+  .copy:hover { color: var(--fg); border-color: var(--line-2); }
+  .copy.done { color: var(--ok); border-color: rgba(62,207,142,.4); }
+  .where { border-left: 1px solid var(--line); padding-left: clamp(20px, 3vw, 34px); }
+  @media (max-width: 860px) { .where { border-left: 0; border-top: 1px solid var(--line); padding: 24px 0 0; } }
+  .where h3 { margin-bottom: 12px; }
+  .where p { margin: 0 0 1em; color: var(--dim); font-size: .97rem; }
+  .where pre {
+    margin: 0; padding: 16px; background: var(--bg); border: 1px solid var(--line);
+    border-radius: 9px; overflow-x: auto; font-family: var(--mono); font-size: .84rem;
+    line-height: 1.65; color: #cfd6e4;
+  }
+  .where pre .c { color: #6b7484; }
+  .where pre .s { color: #d7a76a; }
+  .where pre .k { color: #7fb2ff; }
+  .where ol { margin: 0; padding: 0; list-style: none; counter-reset: w; }
+  .where ol li { counter-increment: w; position: relative; padding: 0 0 12px 28px; color: var(--dim); font-size: .95rem; }
+  .where ol li:last-child { padding-bottom: 0; }
+  .where ol li::before { content: counter(w); position: absolute; left: 0; top: 0; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+  /* ── честный блок и FAQ ────────────────────────────────────────────── */
+  .rows { border-top: 1px solid var(--line); }
+  .row { display: grid; grid-template-columns: 260px 1fr; gap: clamp(16px, 4vw, 48px); padding: 24px 0; border-bottom: 1px solid var(--line); }
+  @media (max-width: 780px) { .row { grid-template-columns: 1fr; gap: 8px; } }
+  .row dt { font-weight: 500; }
+  .row dd { margin: 0; color: var(--dim); }
+
+  details {
+    border-bottom: 1px solid var(--line); padding: 4px 0;
+  }
+  details summary {
+    list-style: none; cursor: pointer; padding: 22px 40px 22px 0; position: relative;
+    font-size: 1.12rem; font-weight: 500; letter-spacing: -.015em;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after {
+    content: "+"; position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+    font-family: var(--mono); font-size: 1.3rem; color: var(--muted); transition: transform .18s ease, color .18s ease;
+  }
+  details[open] summary::after { content: "−"; color: var(--accent); }
+  details .answer { padding: 0 clamp(0px, 6vw, 90px) 24px 0; color: var(--dim); }
+  details .answer p { margin: 0 0 1em; }
+  details .answer p:last-child { margin-bottom: 0; }
+
+  /* ── финал ─────────────────────────────────────────────────────────── */
+  .final { text-align: left; }
+  .final .box {
+    border: 1px solid var(--line); border-radius: 16px; background: var(--bg-2);
+    padding: clamp(28px, 5vw, 52px);
+    display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(28px, 5vw, 60px); align-items: start;
+  }
+  @media (max-width: 860px) { .final .box { grid-template-columns: 1fr; } }
+  .steps { list-style: none; counter-reset: s; margin: 0; padding: 0; }
+  .steps li { counter-increment: s; position: relative; padding: 0 0 18px 34px; color: var(--dim); font-size: .97rem; }
+  .steps li::before {
+    content: counter(s, decimal-leading-zero); position: absolute; left: 0; top: 1px;
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+  }
+  .steps li:last-child { padding-bottom: 0; }
+  .steps b { color: var(--fg); font-weight: 500; }
+
+  footer { border-top: 1px solid var(--line); padding: 40px 0 56px; color: var(--muted); font-size: .92rem; }
+  .foot { display: flex; flex-wrap: wrap; gap: 16px 30px; align-items: center; justify-content: space-between; }
+  .foot a { color: var(--dim); }
+  .foot a:hover { color: var(--fg); }
+  .seat { font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em; color: var(--muted); }
+</style>
+
+<header class="top" id="top">
+  <div class="wrap top-in">
+    <a class="mark" href="#top">
+      <svg width="26" height="26" viewBox="0 0 1024 1024" aria-hidden="true">
+        <defs><linearGradient id="lg" gradientUnits="userSpaceOnUse" x1="512" y1="0" x2="512" y2="1024">
+          <stop offset="0" stop-color="#6890FF"/><stop offset="1" stop-color="#2246BE"/></linearGradient></defs>
+        <rect width="1024" height="1024" rx="229" fill="url(#lg)"/>
+        <circle cx="512" cy="368" r="196" fill="#fff"/>
+        <path d="M402 466 L330 812 Q323 852 364 852 L660 852 Q701 852 694 812 L622 466 Z" fill="#fff"/>
+      </svg>
+      Seatkey
+    </a>
+    <nav class="top-nav">
+      <a href="#connect">Подключение</a>
+      <a href="#money">Деньги</a>
+      <a href="#log">Журнал</a>
+      <a href="#faq">Вопросы</a>
+      <a class="btn sm" href="#get">Скачать</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="kicker"><b>Seatkey</b> локальный шлюз · macOS</p>
+      <h1>Вы уже платите<br>за Claude&nbsp;Code.<br><span class="soft">Пусть он работает не только в терминале.</span></h1>
+      <p class="big">
+        Seatkey превращает вашу подписку на Claude Code, Codex CLI или Cursor Agent
+        в обычный OpenAI-адрес на вашем компьютере. Вставьте его в Obsidian,
+        Open WebUI или свой скрипт — и они заработают.
+      </p>
+      <div class="hero-cta">
+        <a class="btn" href="#get">Скачать для macOS</a>
+        <a class="btn ghost" href="#connect">Как подключить приложение</a>
+      </div>
+      <p class="hero-fine">
+        <span><i class="led"></i> macOS, Apple Silicon</span>
+        <span>Без API-ключей</span>
+        <span>Ничего не уходит в облако</span>
+      </p>
+    </div>
+    <div class="shot">
+      <img src="shots/app-endpoints.png" width="1770" height="1140"
+           alt="Окно Seatkey: список точек доступа, адрес и ключ выбранной точки">
+    </div>
+  </div>
+</section>
+
+<section id="why">
+  <div class="wrap">
+    <div class="head">
+      <p class="kicker">01 — в чём дело</p>
+      <h2 class="lead">За один и тот же ответ<br>вы платите дважды.</h2>
+    </div>
+    <div class="two">
+      <div class="col">
+        <p class="col-label">как это выглядит сейчас</p>
+        <p>Подписка на Claude Code, Codex или Cursor — фиксированная и уже оплачена. Но живёт она в терминале: в редакторе кода и в консоли.</p>
+        <p>Стоит захотеть ту же модель в заметках, в переводчике или в своём скрипте — и выясняется, что приложениям нужен «OpenAI API». То есть <strong>второй счёт</strong>, где деньги считают по токенам, и счётчик крутится с каждого вопроса.</p>
+        <p>Место в подписке при этом простаивает.</p>
+      </div>
+      <div class="col">
+        <p class="col-label on">как это выглядит с Seatkey</p>
+        <p>Seatkey поднимает на вашем компьютере обычный OpenAI-совместимый адрес и выполняет запросы <strong>тем самым CLI</strong>, который у вас установлен и оплачен.</p>
+        <p>Приложение видит привычный <code>/v1/chat/completions</code> и не догадывается, что за ним стоит агент из терминала. Ключи API не нужны: запрос оплачивает подписка, которая у вас и так есть.</p>
+        <p>Второго счёта не появляется вовсе.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="connect">
+  <div class="wrap">
+    <div class="head">
+      <p class="kicker">02 — подключение</p>
+      <h2 class="lead">Три поля, и приложение работает.</h2>
+      <p class="big lead">Seatkey выдаёт каждому приложению свой адрес и свой ключ. Дальше — обычная настройка «своего OpenAI-сервера», которая есть почти везде.</p>
+    </div>
+
+    <div class="connector">
+      <div class="tabs" role="tablist" id="tabs"></div>
+      <div class="panel">
+        <div>
+          <div class="field">
+            <label for="f-url">Base URL</label>
+            <div class="val"><span id="f-url"></span><button class="copy" data-copy="f-url">копировать</button></div>
+          </div>
+          <div class="field">
+            <label for="f-key">API-ключ</label>
+            <div class="val"><span id="f-key"></span><button class="copy" data-copy="f-key">копировать</button></div>
+          </div>
+          <div class="field">
+            <label for="f-model">Модель</label>
+            <div class="val"><span id="f-model"></span><button class="copy" data-copy="f-model">копировать</button></div>
+          </div>
+        </div>
+        <div class="where">
+          <h3 id="w-title"></h3>
+          <p id="w-note"></p>
+          <ol id="w-steps"></ol>
+          <pre id="w-code"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="money">
+  <div class="wrap">
+    <div class="head">
+      <p class="kicker">03 — деньги</p>
+      <h2 class="lead">Seatkey считает то,<br>чего нет в вашем счёте.</h2>
+      <p class="big lead">
+        Каждый ход стоил бы денег, если бы шёл через API. Приложение берёт стоимость
+        у самого агента — Claude Code сообщает её сам — и показывает, во что обошёлся бы
+        тот же трафик по прайсу.
+      </p>
+    </div>
+
+    <figure>
+      <img src="shots/app-stats-month.png" width="1770" height="1140"
+           alt="Экран статистики Seatkey: запросы, токены и эквивалент по API за месяц">
+      <figcaption>Статистика за месяц. Данные на снимке демонстрационные.</figcaption>
+    </figure>
+
+    <div class="facts">
+      <div class="fact">
+        <div class="n">≈$0.10<small>за ход</small></div>
+        <p>Столько стоил бы по прайсу API один запрос к Claude Code. Живой замер на моей машине: $7.74 за 75 запросов, цифру сообщил сам CLI.</p>
+      </div>
+      <div class="fact">
+        <div class="n">$0<small>сверх подписки</small></div>
+        <p>Seatkey не покупает токены и не ходит в API. Запрос выполняет ваш агент — тот, за которого уже уплачено.</p>
+      </div>
+      <div class="fact">
+        <div class="n">3<small>агента</small></div>
+        <p>Claude Code, Codex CLI и Cursor Agent. Какой из них стоит за адресом, решаете вы — и в любой момент меняете, не трогая приложение.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="log">
+  <div class="wrap" style="max-width:1280px;padding-left:var(--pad);padding-right:var(--pad)">
+    <div class="head">
+      <p class="kicker">04 — что происходит внутри</p>
+      <h2 class="lead">Видно каждый запрос.<br>И ни один не уходит с компьютера.</h2>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="two">
+      <figure class="log-shot">
+        <img src="shots/app-requests.png" width="1770" height="1140"
+             alt="Журнал запросов Seatkey: время, приложение, модель, статус и токены">
+        <figcaption>Журнал запросов. Данные на снимке демонстрационные.</figcaption>
+      </figure>
+      <div class="col">
+        <p>Кто спросил, какой моделью, сколько это заняло и чем закончилось — журнал обновляется на глазах, пока приложение работает.</p>
+        <p><strong>Тела запросов по умолчанию не пишутся.</strong> В базу идут только метаданные; сами промты и ответы появляются там, только если вы включите это сами — и остаются в локальной SQLite.</p>
+        <p>Сервер слушает <code>127.0.0.1</code>, телеметрии нет. Единственный запрос наружу, который Seatkey делает по своей инициативе, — анонимная проверка обновлений, и её можно выключить.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="honest">
+  <div class="wrap">
+    <div class="head">
+      <p class="kicker">05 — до того, как скачаете</p>
+      <h2 class="lead">Что честнее сказать сразу.</h2>
+    </div>
+    <dl class="rows">
+      <div class="row">
+        <dt>Пока только macOS</dt>
+        <dd>Сборка есть под Apple Silicon. Код кроссплатформенный, но дистрибутивов под Windows и Linux ещё нет.</dd>
+      </div>
+      <div class="row">
+        <dt>Подписку он не заменяет</dt>
+        <dd>Нужен установленный и оплаченный агент — Claude Code, Codex CLI или Cursor Agent. Seatkey пользуется вашим, а не своим.</dd>
+      </div>
+      <div class="row">
+        <dt>Умеет не весь OpenAI API</dt>
+        <dd>Нет embeddings, аудио и генерации картинок. У Cursor нет и картинок на вход. Всё, что CLI не умеет, возвращается понятной ошибкой до траты лимита, а не молчанием.</dd>
+      </div>
+      <div class="row">
+        <dt>Ключ — на один компьютер</dt>
+        <dd>Лицензия срочная и привязана к машине, проверяется без сети. Пока ключа нет, приложение работает, но запросы к моделям не проходят.</dd>
+      </div>
+      <div class="row">
+        <dt>Первая установка требует одного действия</dt>
+        <dd>Сборка подписана самодельным сертификатом, а не Apple Developer ID: macOS один раз попросит подтвердить запуск.</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="head">
+      <p class="kicker">06 — вопросы</p>
+      <h2 class="lead">То, что спрашивают первым.</h2>
+    </div>
+    <div>
+      <details open>
+        <summary>Это не нарушает правила подписки?</summary>
+        <div class="answer">
+          <p>Seatkey запускает официальный CLI провайдера как подпроцесс — на вашей машине, под вашей учётной записью, с вашей подпиской. Он не эмулирует их HTTP-API, не читает и не пересылает их токены, не открывает доступ никому, кроме вас: сервер слушает только <code>127.0.0.1</code>.</p>
+          <p>Это ровно то же, что вы делаете руками в терминале, — но вызывает это ваше приложение вместо вас. Условия конкретного тарифа всё равно стоит прочитать самому: у провайдеров они разные и меняются.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Чем это лучше обычного API-ключа?</summary>
+        <div class="answer">
+          <p>API-ключ считает деньги по токенам, и каждый вопрос из заметок стоит отдельно. Подписка уже оплачена и не считает ничего — Seatkey просто даёт до неё дотянуться.</p>
+          <p>Побочно: не нужно заводить второй счёт, следить за балансом и раскладывать секретный ключ по настройкам десятка приложений. Ключ у каждого приложения свой и локальный — отозвать его можно, не трогая остальные.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Мои переписки куда-то уходят?</summary>
+        <div class="answer">
+          <p>Нет. Всё происходит между вашими приложениями и вашим же агентом на этой машине. История запросов лежит в локальной базе, тела запросов не пишутся, пока вы не включите это сами.</p>
+          <p>Единственный сетевой запрос по инициативе Seatkey — анонимная проверка обновлений на GitHub, без идентификаторов; выключается в настройках.</p>
+        </div>
+      </details>
+      <details>
+        <summary>А если агент обновится и что-то сломается?</summary>
+        <div class="answer">
+          <p>Seatkey общается с CLI так же, как человек: запускает бинарник и читает его вывод. Поэтому обновление агента обычно не ломает всё разом — отваливается что-то одно.</p>
+          <p>Когда это случается, видно, что именно: в журнале остаётся упавший запрос с текстом ошибки, а «Отчёт о проблеме» собирает в один файл версии, диагностику и последние запросы. Обновления самого Seatkey приходят по кнопке, установку он никогда не начинает сам — иначе перезапуск оборвал бы чужие запросы.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Windows и Linux будут?</summary>
+        <div class="answer">
+          <p>Код кроссплатформенный, и приложение на них собирается — не выложены дистрибутивы. Если нужна сборка под вашу систему, напишите в issues: очередь определяется спросом.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Сколько стоит?</summary>
+        <div class="answer">
+          <p>Сейчас ранний доступ. Приложение платное, ключ выдаётся по запросу и привязывается к вашему компьютеру; об условиях договариваемся в переписке.</p>
+          <p>Скачать и посмотреть можно уже сейчас: интерфейс, настройки и диагностика работают без ключа — закрыты только сами запросы к моделям.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section id="get" class="final">
+  <div class="wrap">
+    <div class="head">
+      <p class="kicker">07 — забрать</p>
+      <h2 class="lead">Ранний доступ.</h2>
+    </div>
+    <div class="box">
+      <div>
+        <p class="big" style="margin:0 0 26px">
+          Скачайте сборку и попросите ключ — я выпускаю его на отпечаток вашего
+          компьютера, который приложение показывает само.
+        </p>
+        <div class="hero-cta" style="margin:0">
+          <a class="btn" href="https://github.com/ilyabazhenov/seatkey-releases/releases/latest">Скачать последний релиз</a>
+          <a class="btn ghost" href="https://github.com/ilyabazhenov/seatkey-releases/issues/new?title=%D0%9F%D1%80%D0%BE%D1%88%D1%83%20%D0%BA%D0%BB%D1%8E%D1%87&amp;body=%D0%9E%D1%82%D0%BF%D0%B5%D1%87%D0%B0%D1%82%D0%BE%D0%BA%20%D0%BA%D0%BE%D0%BC%D0%BF%D1%8C%D1%8E%D1%82%D0%B5%D1%80%D0%B0%20(Settings%20%E2%86%92%20License)%3A%20SK-">Запросить ключ</a>
+        </div>
+        <p class="hero-fine" style="margin-top:22px">
+          <span><i class="led"></i> macOS, Apple Silicon</span>
+          <span>~130 МБ</span>
+          <span>дальше обновляется само</span>
+        </p>
+      </div>
+      <ol class="steps">
+        <li><b>Распакуйте архив</b> и перенесите Seatkey.app в «Программы».</li>
+        <li><b>Откройте приложение.</b> macOS попросит подтвердить запуск: Системные настройки → «Конфиденциальность и безопасность» → «Всё равно открыть». Один раз.</li>
+        <li><b>Скопируйте адрес</b> первой точки доступа и вставьте его в своё приложение. Ключ лежит там же, рядом.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>
+      <div class="mark" style="margin-bottom:8px">
+        <svg width="22" height="22" viewBox="0 0 1024 1024" aria-hidden="true">
+          <rect width="1024" height="1024" rx="229" fill="url(#lg)"/>
+          <circle cx="512" cy="368" r="196" fill="#fff"/>
+          <path d="M402 466 L330 812 Q323 852 364 852 L660 852 Q701 852 694 812 L622 466 Z" fill="#fff"/>
+        </svg>
+        Seatkey
+      </div>
+      <div class="seat">YOUR SEAT IS YOUR KEY</div>
+    </div>
+    <div class="foot" style="gap:24px">
+      <a href="https://github.com/ilyabazhenov/seatkey-releases/releases">Все версии</a>
+      <a href="https://github.com/ilyabazhenov/seatkey-releases#readme">Установка</a>
+      <a href="https://github.com/ilyabazhenov/seatkey-releases/issues">Написать</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  // ── коннектор ────────────────────────────────────────────────────────
+  const KEY = 'sk-seatkey-3f9a41c8e2b7';
+  const APPS = [
+    {
+      id: 'webui', tab: 'Open WebUI', slug: 'webui', model: 'claude-sonnet-5',
+      title: 'Настройки → Соединения',
+      note: 'В разных версиях раздел лежит то в настройках, то в админ-панели, но называется одинаково.',
+      steps: [
+        'Найдите настройку OpenAI-совместимого соединения.',
+        'Вставьте в неё адрес и ключ из полей слева.',
+        'Обновите список моделей — придут те, что заданы у этой точки.',
+      ],
+    },
+    {
+      id: 'obsidian', tab: 'Obsidian', slug: 'obsidian', model: 'claude-sonnet-5',
+      title: 'Настройки плагина',
+      note: 'Сам Obsidian моделей не знает — их приносит плагин. Подойдёт любой, у которого есть поле своего сервера: Copilot, Smart Composer, Text Generator.',
+      steps: [
+        'В настройках плагина выберите провайдера OpenAI (или «совместимый»).',
+        'Base URL и ключ — из полей слева.',
+        'Имя модели впишите ровно как здесь: claude-sonnet-5.',
+      ],
+    },
+    {
+      id: 'continue', tab: 'Continue.dev', slug: 'continue', model: 'claude-sonnet-5',
+      title: 'config.yaml',
+      code: `models:
+  - name: <span class="s">Seatkey</span>
+    provider: <span class="s">openai</span>
+    model: <span class="s">claude-sonnet-5</span>
+    apiBase: <span class="s">http://127.0.0.1:8899/e/continue/v1</span>
+    apiKey: <span class="s">${KEY}</span>`,
+    },
+    {
+      id: 'python', tab: 'Python', slug: 'scripts', model: 'gpt-5.6',
+      title: 'Официальный SDK, без правок',
+      code: `<span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = OpenAI(
+    base_url=<span class="s">"http://127.0.0.1:8899/e/scripts/v1"</span>,
+    api_key=<span class="s">"${KEY}"</span>,
+)
+answer = client.chat.completions.create(
+    model=<span class="s">"gpt-5.6"</span>,
+    messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"Привет"</span>}],
+)`,
+    },
+    {
+      id: 'curl', tab: 'cURL', slug: 'scripts', model: 'claude-sonnet-5',
+      title: 'Проверить за десять секунд',
+      code: `curl http://127.0.0.1:8899/e/scripts/v1/chat/completions \\
+  -H <span class="s">'authorization: Bearer ${KEY}'</span> \\
+  -H <span class="s">'content-type: application/json'</span> \\
+  -d <span class="s">'{"messages":[{"role":"user","content":"Привет"}]}'</span>`,
+    },
+  ];
+
+  const tabs = document.getElementById('tabs');
+  const url = document.getElementById('f-url');
+  const key = document.getElementById('f-key');
+  const model = document.getElementById('f-model');
+  const wTitle = document.getElementById('w-title');
+  const wNote = document.getElementById('w-note');
+  const wCode = document.getElementById('w-code');
+  const wSteps = document.getElementById('w-steps');
+
+  function show(app) {
+    url.textContent = `http://127.0.0.1:8899/e/${app.slug}/v1`;
+    key.textContent = KEY;
+    model.textContent = app.model;
+    wTitle.textContent = app.title;
+    wNote.textContent = app.note ?? '';
+    wNote.style.display = app.note ? '' : 'none';
+    wSteps.innerHTML = '';
+    for (const step of app.steps ?? []) {
+      const li = document.createElement('li');
+      li.textContent = step;
+      wSteps.append(li);
+    }
+    wSteps.style.display = app.steps ? '' : 'none';
+    wCode.innerHTML = app.code ?? '';
+    wCode.style.display = app.code ? '' : 'none';
+    for (const b of tabs.children) b.setAttribute('aria-selected', String(b.dataset.id === app.id));
+  }
+
+  for (const app of APPS) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.role = 'tab';
+    b.dataset.id = app.id;
+    b.textContent = app.tab;
+    b.addEventListener('click', () => show(app));
+    tabs.append(b);
+  }
+  show(APPS[0]);
+
+  // Копирование: без обещаний — если буфер недоступен, кнопка молчит.
+  for (const btn of document.querySelectorAll('.copy')) {
+    btn.addEventListener('click', async () => {
+      const text = document.getElementById(btn.dataset.copy).textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = 'скопировано';
+        btn.classList.add('done');
+        setTimeout(() => { btn.textContent = 'копировать'; btn.classList.remove('done'); }, 1600);
+      } catch { /* нет доступа к буферу — оставляем как есть */ }
+    });
+  }
+
+  // Линия под шапкой появляется только когда под ней что-то уехало.
+  // Имя topBar, а не top: `top` — это window.top, и объявление его ломает скрипт целиком.
+  const topBar = document.querySelector('header.top');
+  const onScroll = () => topBar.classList.toggle('stuck', window.scrollY > 8);
+  onScroll();
+  addEventListener('scroll', onScroll, { passive: true });
+})();
+</script>
+</body>
+</html>
