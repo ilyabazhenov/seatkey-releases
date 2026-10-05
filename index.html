@@ -14,11 +14,18 @@
 <link rel="alternate" hreflang="en" href="https://seatkey.dev/en/">
 <link rel="alternate" hreflang="x-default" href="https://seatkey.dev/en/">
 <meta name="theme-color" content="#08090b">
+<script>
+  // Выбранная тема ставится до первой отрисовки, иначе страница мигнёт другой.
+  try { const t = localStorage.getItem('seatkey.theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}
+</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024'%3E%3Cdefs%3E%3ClinearGradient id='p' gradientUnits='userSpaceOnUse' x1='512' y1='0' x2='512' y2='1024'%3E%3Cstop offset='0' stop-color='%236890FF'/%3E%3Cstop offset='1' stop-color='%232246BE'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1024' height='1024' rx='229' fill='url(%23p)'/%3E%3Ccircle cx='512' cy='368' r='196' fill='%23fff'/%3E%3Cpath d='M402 466 L330 812 Q323 852 364 852 L660 852 Q701 852 694 812 L622 466 Z' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  /* Тёмная тема — основная: она и без выбора, и в браузерах без prefers-color-scheme.
+     Светлая задана двумя одинаковыми блоками ниже — по системе и по выбору на
+     странице. Держать их одинаковыми. */
   :root {
     color-scheme: dark;
     --bg: #08090b;
@@ -32,9 +39,81 @@
     --accent: #5b8cff;
     --ok: #3ecf8e;
     --warn: #e0a33a;
+    --del: #e5736b;
+    --on-fg: #0a0b0d;
+    --on-accent: #0a0b0d;
+    --btn-hover: #ffffff;
+    --tint: rgba(255,255,255,.05);
+    --code-bg: rgba(255,255,255,.055);
+    --code-fg: #cfd6e4;
+    --code-k: #7fb2ff;
+    --code-s: #d7a76a;
+    --code-c: #6b7484;
+    --seg-term: #464e5e;
+    --shadow-shot: 0 40px 120px -30px rgba(0,0,0,.9), 0 2px 0 rgba(255,255,255,.05) inset;
+    --shadow-fig: 0 40px 100px -40px rgba(0,0,0,.9);
+    --shadow-pop: 0 10px 30px rgba(0,0,0,.5);
     --sans: "Onest", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     --pad: clamp(20px, 5vw, 56px);
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      color-scheme: light;
+      --bg: #f7f8fa;
+      --bg-2: #eef0f4;
+      --panel: #ffffff;
+      --line: rgba(15,23,42,.09);
+      --line-2: rgba(15,23,42,.17);
+      --fg: #0e1116;
+      --dim: #3f4754;
+      --muted: #697180;
+      --accent: #2f63e8;
+      --ok: #13875a;
+      --warn: #b4740f;
+      --del: #c2453a;
+      --on-fg: #ffffff;
+      --on-accent: #ffffff;
+      --btn-hover: #000000;
+      --tint: rgba(15,23,42,.04);
+      --code-bg: rgba(15,23,42,.05);
+      --code-fg: #273040;
+      --code-k: #1f5fd1;
+      --code-s: #9a5a12;
+      --code-c: #7a8291;
+      --seg-term: #c9ced8;
+      --shadow-shot: 0 30px 80px -30px rgba(15,23,42,.35);
+      --shadow-fig: 0 30px 70px -35px rgba(15,23,42,.3);
+      --shadow-pop: 0 10px 30px rgba(15,23,42,.16);
+    }
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #f7f8fa;
+    --bg-2: #eef0f4;
+    --panel: #ffffff;
+    --line: rgba(15,23,42,.09);
+    --line-2: rgba(15,23,42,.17);
+    --fg: #0e1116;
+    --dim: #3f4754;
+    --muted: #697180;
+    --accent: #2f63e8;
+    --ok: #13875a;
+    --warn: #b4740f;
+    --del: #c2453a;
+    --on-fg: #ffffff;
+    --on-accent: #ffffff;
+    --btn-hover: #000000;
+    --tint: rgba(15,23,42,.04);
+    --code-bg: rgba(15,23,42,.05);
+    --code-fg: #273040;
+    --code-k: #1f5fd1;
+    --code-s: #9a5a12;
+    --code-c: #7a8291;
+    --seg-term: #c9ced8;
+    --shadow-shot: 0 30px 80px -30px rgba(15,23,42,.35);
+    --shadow-fig: 0 30px 70px -35px rgba(15,23,42,.3);
+    --shadow-pop: 0 10px 30px rgba(15,23,42,.16);
   }
 
   * { box-sizing: border-box; }
@@ -44,7 +123,7 @@
     font-family: var(--sans); font-size: 17px; line-height: 1.62; font-weight: 400;
     -webkit-font-smoothing: antialiased;
   }
-  ::selection { background: rgba(91,140,255,.32); }
+  ::selection { background: color-mix(in srgb, var(--accent) 32%, transparent); }
   a { color: inherit; text-decoration: none; }
   img { display: block; max-width: 100%; height: auto; }
   h1, h2, h3 { font-weight: 600; letter-spacing: -.028em; margin: 0; }
@@ -69,7 +148,7 @@
   .mono { font-family: var(--mono); }
   code {
     font-family: var(--mono); font-size: .88em;
-    background: rgba(255,255,255,.055); border: 1px solid var(--line);
+    background: var(--code-bg); border: 1px solid var(--line);
     padding: .1em .4em; border-radius: 5px;
   }
 
@@ -78,12 +157,12 @@
     display: inline-flex; align-items: center; gap: .6em; cursor: pointer;
     font-family: inherit; font-size: 1rem; font-weight: 500; line-height: 1;
     padding: 1em 1.5em; border-radius: 10px; border: 1px solid transparent;
-    background: var(--fg); color: #0a0b0d;
+    background: var(--fg); color: var(--on-fg);
     transition: transform .14s ease, background .14s ease, border-color .14s ease;
   }
-  .btn:hover { transform: translateY(-1px); background: #fff; }
+  .btn:hover { transform: translateY(-1px); background: var(--btn-hover); }
   .btn.ghost { background: transparent; color: var(--fg); border-color: var(--line-2); }
-  .btn.ghost:hover { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.3); }
+  .btn.ghost:hover { background: var(--tint); border-color: color-mix(in srgb, var(--fg) 30%, transparent); }
   .btn.sm { padding: .68em 1.05em; font-size: .9rem; border-radius: 8px; }
 
   /* ── шапка ─────────────────────────────────────────────────────────── */
@@ -100,7 +179,7 @@
   .top-nav a { color: var(--dim); font-size: .95rem; }
   .top-nav a:hover { color: var(--fg); }
   /* Кнопка в шапке — тоже ссылка, и правило выше перебивало её цвет. */
-  .top-nav a.btn { color: #0a0b0d; }
+  .top-nav a.btn { color: var(--on-fg); }
   @media (max-width: 780px) { .top-nav a:not(.btn) { display: none; } }
   /* Переключатель языка остаётся и на телефоне, где остальное меню прячется. */
   .top-nav a.lang {
@@ -108,6 +187,16 @@
     padding: .3em .55em; border: 1px solid var(--line-2); border-radius: 6px;
   }
   @media (max-width: 780px) { .top-nav a.lang { display: inline-block; } }
+  /* Переключатель темы виден только со скриптом: без него страница просто следует системе. */
+  .theme {
+    display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 30px;
+    background: none; border: 1px solid var(--line-2); border-radius: 6px; color: var(--dim); cursor: pointer;
+  }
+  .theme[hidden] { display: none; }
+  .theme:hover { color: var(--fg); }
+  .theme:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .theme[data-now="dark"] .moon, .theme[data-now="light"] .sun { display: none; }
+  @media (max-width: 780px) { .top-nav { gap: 12px; } }
 
   /* ── герой ─────────────────────────────────────────────────────────── */
   .hero { padding: clamp(36px, 4.5vw, 56px) 0 clamp(20px, 4vw, 44px); overflow: hidden; }
@@ -121,14 +210,14 @@
   .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
   .hero-fine { margin-top: 20px; font-size: .9rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 20px; }
   .hero-fine span { display: inline-flex; align-items: center; gap: 8px; }
-  .led { width: 6px; height: 6px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px rgba(62,207,142,.16); }
+  .led { width: 6px; height: 6px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 16%, transparent); }
 
   /* Снимок уезжает за правый край страницы: так он читается как продолжение
      экрана, а не как картинка, аккуратно уложенная в колонку. */
   .shot { position: relative; }
   .shot img {
     width: min(1120px, 158%); max-width: none; border-radius: 12px; border: 1px solid var(--line-2);
-    box-shadow: 0 40px 120px -30px rgba(0,0,0,.9), 0 2px 0 rgba(255,255,255,.05) inset;
+    box-shadow: var(--shadow-shot);
   }
   @media (max-width: 960px) {
     .hero > .wrap { max-width: 1280px; padding-right: var(--pad); padding-left: var(--pad); }
@@ -162,13 +251,13 @@
   .sx-pre {
     margin: 14px 0 0; padding: 14px 16px; background: var(--bg-2);
     border: 1px solid var(--line); border-radius: 10px;
-    font-family: var(--mono); font-size: 12px; line-height: 1.6; color: #cfd6e4;
+    font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--code-fg);
     white-space: pre-wrap; overflow-wrap: anywhere;
   }
   .sx-pre .m { color: var(--accent); }
   .sx-pre .h { color: var(--muted); }
-  .sx-pre .k { color: #7fb2ff; }
-  .sx-pre .s { color: #d7a76a; }
+  .sx-pre .k { color: var(--code-k); }
+  .sx-pre .s { color: var(--code-s); }
   .sx-pre .n { color: var(--warn); }
   .sx-pre .st { color: var(--ok); }
   .sx-note { margin: 10px 0 0; font-size: .84rem; line-height: 1.5; color: var(--muted); }
@@ -218,7 +307,7 @@
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 5vw, 72px); }
   @media (max-width: 860px) { .two { grid-template-columns: 1fr; gap: 34px; } }
   .col-label { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding-bottom: 14px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
-  .col-label.on { color: var(--accent); border-color: rgba(91,140,255,.4); }
+  .col-label.on { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, transparent); }
   .col p { margin: 0 0 1em; color: var(--dim); }
   .col p:last-child { margin-bottom: 0; }
   .col strong { color: var(--fg); font-weight: 500; }
@@ -237,7 +326,11 @@
     #log .log-shot img { width: 100%; max-width: 100%; }
     #log figcaption { align-self: flex-start; }
   }
-  figure img { border-radius: 12px; border: 1px solid var(--line-2); box-shadow: 0 40px 100px -40px rgba(0,0,0,.9); }
+  /* <picture> только выбирает файл под тему; в вёрстке его быть не должно —
+     правила для снимков написаны про img и его родителя. */
+  picture { display: contents; }
+  #access figure { margin-bottom: 44px; }
+  figure img { border-radius: 12px; border: 1px solid var(--line-2); box-shadow: var(--shadow-fig); }
   figcaption { margin-top: 14px; font-size: .84rem; color: var(--muted); font-family: var(--mono); }
 
   .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin-top: 44px; }
@@ -280,7 +373,7 @@
     transition: color .14s ease, border-color .14s ease;
   }
   .copy:hover { color: var(--fg); border-color: var(--line-2); }
-  .copy.done { color: var(--ok); border-color: rgba(62,207,142,.4); }
+  .copy.done { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, transparent); }
   .where { border-left: 1px solid var(--line); padding-left: clamp(20px, 3vw, 34px); }
   @media (max-width: 860px) { .where { border-left: 0; border-top: 1px solid var(--line); padding: 24px 0 0; } }
   .where h3 { margin-bottom: 12px; }
@@ -288,29 +381,28 @@
   .where pre {
     margin: 0; padding: 16px; background: var(--bg); border: 1px solid var(--line);
     border-radius: 9px; overflow-x: auto; font-family: var(--mono); font-size: .84rem;
-    line-height: 1.65; color: #cfd6e4;
+    line-height: 1.65; color: var(--code-fg);
   }
-  .where pre .c { color: #6b7484; }
-  .where pre .s { color: #d7a76a; }
-  .where pre .k { color: #7fb2ff; }
+  .where pre .c { color: var(--code-c); }
+  .where pre .s { color: var(--code-s); }
+  .where pre .k { color: var(--code-k); }
   .where ol { margin: 0; padding: 0; list-style: none; counter-reset: w; }
   .where ol li { counter-increment: w; position: relative; padding: 0 0 12px 28px; color: var(--dim); font-size: .95rem; }
   .where ol li:last-child { padding-bottom: 0; }
   .where ol li::before { content: counter(w); position: absolute; left: 0; top: 0; font-family: var(--mono); font-size: 11px; color: var(--muted); }
 
   /* Поля подключения — как дифф: что было в приложении и что стало. */
-  .connector { --del: #e5736b; }
   .field .was {
     display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
     padding: 8px 14px; border-radius: 9px;
-    border: 1px solid rgba(229,115,107,.16); background: rgba(229,115,107,.05);
+    border: 1px solid color-mix(in srgb, var(--del) 16%, transparent); background: color-mix(in srgb, var(--del) 5%, transparent);
     font-family: var(--mono); font-size: .86rem; color: var(--muted);
   }
   .field .was::before, .field .val::before { font-family: var(--mono); font-size: .92rem; width: 10px; flex: none; }
   .field .was::before { content: "−"; color: var(--del); }
   .field .val::before { content: "+"; color: var(--ok); }
-  .field .val { border-color: rgba(62,207,142,.22); }
-  .field .was s { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-decoration-color: rgba(229,115,107,.55); }
+  .field .val { border-color: color-mix(in srgb, var(--ok) 24%, transparent); }
+  .field .was s { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-decoration-color: color-mix(in srgb, var(--del) 55%, transparent); }
   .field .was small { flex: none; font-size: 11px; color: var(--del); }
   @media (max-width: 520px) { .field .was small { display: none; } }
 
@@ -339,21 +431,26 @@
   }
   /* Отступ у подписи, а не у сегмента: иначе узкие доли раздувались бы до ширины отступов. */
   .seg em { font-style: normal; overflow: hidden; padding: 0 8px; }
-  .seg.term { background: #464e5e; color: var(--fg); }
-  .seg.app { background: var(--accent); color: #0a0b0d; }
+  .seg.term { background: var(--seg-term); color: var(--fg); }
+  .seg.app { background: var(--accent); color: var(--on-accent); }
   .seg.lost {
-    background: repeating-linear-gradient(135deg, rgba(224,163,58,.42) 0 2px, transparent 2px 8px), rgba(224,163,58,.07);
+    background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--warn) 42%, transparent) 0 2px, transparent 2px 8px), color-mix(in srgb, var(--warn) 7%, transparent);
     color: var(--fg);
   }
   .burn-legend { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 4px; font-size: .9rem; color: var(--dim); }
   .burn-legend span { display: inline-flex; align-items: center; gap: 8px; }
   .burn-legend i { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+  .burn-legend .sw-term { background: var(--seg-term); }
+  .burn-legend .sw-app { background: var(--accent); }
+  .burn-legend .sw-lost {
+    background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--warn) 60%, transparent) 0 2px, transparent 2px 5px), color-mix(in srgb, var(--warn) 10%, transparent);
+  }
   .burn figcaption { margin: 0; max-width: 72ch; font-family: var(--sans); font-size: .9rem; line-height: 1.55; }
   .burn-tip {
     position: absolute; z-index: 5; pointer-events: none; transform: translate(-50%, calc(-100% - 12px));
     padding: 7px 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line-2);
     font-family: var(--mono); font-size: 12px; color: var(--fg); white-space: nowrap;
-    box-shadow: 0 10px 30px rgba(0,0,0,.5);
+    box-shadow: var(--shadow-pop);
   }
   @media (max-width: 700px) {
     .burn-head, .burn-row { grid-template-columns: minmax(0, 100fr) minmax(0, 36fr); }
@@ -428,6 +525,7 @@
       <a href="#access">Доступы</a>
       <a href="#log">Журнал</a>
       <a href="#faq">Вопросы</a>
+      <button type="button" class="theme" id="theme" hidden data-to-light="Светлая тема" data-to-dark="Тёмная тема"><svg class="sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg><svg class="moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
       <a class="lang" href="/en/" hreflang="en" lang="en" title="English version">EN</a>
       <a class="btn sm" href="#get">Скачать</a>
     </nav>
@@ -500,13 +598,9 @@
         <span>Сервер только на 127.0.0.1</span>
       </p>
     </div>
-    <!-- ПЕРЕСНЯТЬ: снимок с v0.4.1 — в боковом меню пять разделов, шестого
-         («Доступы») ещё нет, а внизу стоит номер старой версии. Форма точки
-         переехала на группы со сводкой, поля «Описание» больше нет.
-         Имя файла то же: достаточно положить новый PNG на место старого. -->
     <div class="shot">
-      <img src="shots/app-endpoints.png" width="1770" height="1140"
-           alt="Окно Seatkey: список точек доступа, адрес и ключ выбранной точки">
+      <picture><source srcset="shots/app-endpoints-light.png" media="(prefers-color-scheme: light)" data-theme-source><img src="shots/app-endpoints.png" width="1770" height="1140"
+           alt="Окно Seatkey: список точек доступа, адрес и ключ выбранной точки"></picture>
     </div>
   </div>
 </section>
@@ -549,9 +643,9 @@
         <div class="burn-out none">не нужен</div>
       </div>
       <div class="burn-legend">
-        <span><i style="background:#464e5e"></i>терминал</span>
-        <span><i style="background:var(--accent)"></i>ваши приложения: Obsidian, Raycast, скрипты</span>
-        <span><i style="background:repeating-linear-gradient(135deg, rgba(224,163,58,.6) 0 2px, transparent 2px 5px), rgba(224,163,58,.1)"></i>сгорит при сбросе</span>
+        <span><i class="sw-term"></i>терминал</span>
+        <span><i class="sw-app"></i>ваши приложения: Obsidian, Raycast, скрипты</span>
+        <span><i class="sw-lost"></i>сгорит при сбросе</span>
       </div>
       <figcaption id="burn-cap">Пример недели, цифры условные. Свои Seatkey показывает на вкладке агентов: загрузку окна 5 часов и окна 7 дней и время до сброса, как их сообщают Claude Code и Codex. У Cursor окон нет, его объём месячный.</figcaption>
     </figure>
@@ -609,12 +703,9 @@
       </p>
     </div>
 
-    <!-- ПЕРЕСНЯТЬ: снимок с v0.4.1 — в боковом меню пять разделов, шестого
-         («Доступы») ещё нет, а внизу стоит номер старой версии.
-         Имя файла то же: достаточно положить новый PNG на место старого. -->
     <figure>
-      <img src="shots/app-stats-month.png" width="1770" height="1140"
-           alt="Экран статистики Seatkey: запросы, токены и эквивалент по API за месяц">
+      <picture><source srcset="shots/app-stats-month-light.png" media="(prefers-color-scheme: light)" data-theme-source><img src="shots/app-stats-month.png" width="1770" height="1140"
+           alt="Экран статистики Seatkey: запросы, токены и эквивалент по API за месяц"></picture>
       <figcaption>Статистика за месяц. Данные на снимке демонстрационные.</figcaption>
     </figure>
 
@@ -648,15 +739,11 @@
       </p>
     </div>
 
-    <!-- Место под снимок раздела «Доступы». Снять экран, положить файл в
-         shots/app-credentials.png (1770×1140, как остальные снимки) и снять
-         эти комментарные скобки — вёрстка под него уже стоит на месте.
     <figure>
-      <img src="shots/app-credentials.png" width="1770" height="1140"
-           alt="Раздел «Доступы» в Seatkey: токены к внешним сервисам со сроками действия">
+      <picture><source srcset="shots/app-credentials-light.png" media="(prefers-color-scheme: light)" data-theme-source><img src="shots/app-credentials.png" width="1770" height="1140"
+           alt="Раздел «Доступы» в Seatkey: токены к внешним сервисам со сроками действия"></picture>
       <figcaption>Доступы к внешним сервисам. Данные на снимке демонстрационные.</figcaption>
     </figure>
-    -->
 
     <dl class="rows">
       <div class="row">
@@ -688,13 +775,9 @@
   </div>
   <div class="wrap">
     <div class="two">
-    <!-- ПЕРЕСНЯТЬ: снимок с v0.4.1 — в боковом меню пять разделов, шестого
-         («Доступы») ещё нет, а внизу стоит номер старой версии. В журнале
-         с тех пор появились строки походов в апстрим и в сервисы по доступам.
-         Имя файла то же: достаточно положить новый PNG на место старого. -->
       <figure class="log-shot">
-        <img src="shots/app-requests.png" width="1770" height="1140"
-             alt="Журнал запросов Seatkey: время, приложение, модель, статус и токены">
+        <picture><source srcset="shots/app-requests-light.png" media="(prefers-color-scheme: light)" data-theme-source><img src="shots/app-requests.png" width="1770" height="1140"
+             alt="Журнал запросов Seatkey: время, приложение, модель, статус и токены"></picture>
         <figcaption>Журнал запросов. Данные на снимке демонстрационные.</figcaption>
       </figure>
       <div class="col">
@@ -845,6 +928,42 @@
 </footer>
 
 <script>
+(() => {
+  // ── тема: системная, пока человек не выбрал сам ─────────────────────
+  // Выбор ставится в <head> до отрисовки; здесь только кнопка и цвет
+  // строки браузера. Остальным частям страницы смена приходит событием.
+  const btn = document.getElementById('theme');
+  if (!btn) return;
+  const root = document.documentElement;
+  const light = matchMedia('(prefers-color-scheme: light)');
+  const meta = document.querySelector('meta[name="theme-color"]');
+  const now = () => root.dataset.theme || (light.matches ? 'light' : 'dark');
+  const sync = () => {
+    const t = now();
+    const label = t === 'dark' ? btn.dataset.toLight : btn.dataset.toDark;
+    btn.dataset.now = t;
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+    if (meta) meta.content = getComputedStyle(root).getPropertyValue('--bg').trim();
+    // Снимки приложения — в теме страницы. Без выбора решает media у <source>,
+    // с выбором — он сам: 'all' и 'not all' перебивают системную настройку.
+    for (const s of document.querySelectorAll('source[data-theme-source]')) {
+      s.media = root.dataset.theme === 'light' ? 'all'
+        : root.dataset.theme === 'dark' ? 'not all' : '(prefers-color-scheme: light)';
+    }
+    document.dispatchEvent(new Event('seatkey:theme'));
+  };
+  btn.addEventListener('click', () => {
+    const next = now() === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try { localStorage.setItem('seatkey.theme', next); } catch { /* выбор продержится до перезагрузки */ }
+    sync();
+  });
+  light.addEventListener('change', sync);
+  btn.hidden = false;
+  sync();
+})();
+
 (() => {
   // ── коннектор ────────────────────────────────────────────────────────
   const KEY = 'sk-seatkey-3f9a41c8e2b7';
@@ -1012,7 +1131,14 @@ answer = client.chat.completions.create(
     cli: 'Так текст приходит от самого CLI: по 60–90 символов раз в полсекунды.',
   };
   const html = root.innerHTML;
-  const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+  let accent = '', baseline = '';
+  const readColors = () => {
+    const cs = getComputedStyle(document.documentElement);
+    accent = cs.getPropertyValue('--accent').trim();
+    baseline = cs.getPropertyValue('--line-2').trim();
+  };
+  readColors();
+  document.addEventListener('seatkey:theme', () => { readColors(); kick(); });
   const nf = (x, d = 0) => x.toLocaleString('ru-RU', { minimumFractionDigits: d, maximumFractionDigits: d });
   const median = a => {
     if (!a.length) return null;
@@ -1075,7 +1201,7 @@ answer = client.chat.completions.create(
   function draw() {
     const now = performance.now(), W = cv.clientWidth, H = cv.clientHeight;
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = 'rgba(255,255,255,.16)';
+    ctx.fillStyle = baseline;
     ctx.fillRect(0, H - 1, W, 1);
     events = events.filter(e => now - e.t < WIN);
     ctx.fillStyle = accent;
