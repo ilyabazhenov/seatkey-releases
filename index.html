@@ -127,6 +127,79 @@
     .shot img { width: 100%; max-width: 100%; }
   }
 
+  /* ── герой-ответ ───────────────────────────────────────────────────── */
+  /* Первый экран приходит потоком, как ответ шлюза. Место под текст занято
+     с самого начала (непришедшая часть просто невидима), поэтому кнопки и
+     снимок не прыгают, пока ответ печатается. */
+  /* Колонка не должна раздаваться по строке запроса: путь в ней не переносится,
+     а обрезается многоточием — без этого на телефоне колонка шире экрана. */
+  .hero-grid > div { min-width: 0; }
+  .sx-wire { border: 0; padding: 0; }
+  .sx-wire summary {
+    list-style: none; cursor: pointer; padding: 0; position: static;
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--mono); font-size: 12px; font-weight: 400; letter-spacing: 0; color: var(--muted);
+  }
+  .sx-wire summary::-webkit-details-marker { display: none; }
+  details.sx-wire summary::after, details.sx-wire[open] summary::after { content: none; }
+  .sx-verb { color: var(--accent); font-weight: 500; }
+  .sx-path { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sx-ok { color: var(--ok); white-space: nowrap; }
+  .sx-rule { flex: 1; min-width: 16px; height: 1px; background: var(--line); }
+  .sx-more { white-space: nowrap; color: var(--dim); }
+  .sx-more::after { content: " +"; }
+  .sx-wire[open] .sx-more::after { content: " −"; color: var(--accent); }
+  .sx-wire summary:hover .sx-more { color: var(--fg); }
+  .sx-pre {
+    margin: 14px 0 0; padding: 14px 16px; background: var(--bg-2);
+    border: 1px solid var(--line); border-radius: 10px;
+    font-family: var(--mono); font-size: 12px; line-height: 1.6; color: #cfd6e4;
+    white-space: pre-wrap; overflow-wrap: anywhere;
+  }
+  .sx-pre .m { color: var(--accent); }
+  .sx-pre .h { color: var(--muted); }
+  .sx-pre .k { color: #7fb2ff; }
+  .sx-pre .s { color: #d7a76a; }
+  .sx-pre .n { color: var(--warn); }
+  .sx-pre .st { color: var(--ok); }
+  .sx-note { margin: 10px 0 0; font-size: .84rem; line-height: 1.5; color: var(--muted); }
+  .sx-ask {
+    width: fit-content; max-width: 100%; margin: 26px 0 0; padding: 10px 16px;
+    background: var(--panel); border: 1px solid var(--line-2); border-radius: 14px 14px 14px 4px;
+    color: var(--fg); font-size: 1rem; line-height: 1.45;
+  }
+  .sx-answer h1 { font-size: clamp(2.1rem, 3.4vw, 3rem); text-wrap: balance; }
+  .sx-pend, .sx-rest { visibility: hidden; }
+  #sx-caret { position: relative; }
+  #sx-caret::after {
+    content: ""; position: absolute; left: 2px; top: .1em; width: .42em; height: .9em;
+    background: var(--accent); border-radius: 1px;
+  }
+  .sx-bar {
+    margin-top: 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+  }
+  .sx-bar[hidden] { display: none; }
+  .sx-seg { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg-2); }
+  .sx-seg button {
+    font: inherit; color: var(--muted); background: none; border: 0; border-radius: 6px;
+    padding: 6px 10px; cursor: pointer; transition: color .14s ease;
+  }
+  .sx-seg button:hover { color: var(--fg); }
+  .sx-seg button[aria-pressed="true"] { background: var(--panel); color: var(--fg); box-shadow: inset 0 0 0 1px var(--line-2); }
+  #sx-strip { width: 150px; height: 26px; display: block; }
+  .sx-stat { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .sx-again {
+    font: inherit; color: var(--dim); background: none; border: 0; padding: 0; cursor: pointer;
+    text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 3px;
+  }
+  .sx-again:hover { color: var(--fg); }
+  .sx-hint { flex-basis: 100%; margin: 0; font-family: var(--sans); font-size: .88rem; line-height: 1.5; color: var(--muted); max-width: 46ch; }
+  .sx-wire summary:focus-visible, .sx-seg button:focus-visible, .sx-again:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .sx-bar + .hero-cta { margin-top: 26px; }
+
   /* ── секции ────────────────────────────────────────────────────────── */
   section { padding: clamp(72px, 11vw, 132px) 0; }
   section + section { border-top: 1px solid var(--line); }
@@ -181,6 +254,8 @@
   .tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
   .panel { padding: clamp(22px, 3.4vw, 34px); display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(24px, 4vw, 48px); }
   @media (max-width: 860px) { .panel { grid-template-columns: 1fr; } }
+  /* Колонки не раздаются по длинному адресу или коду: те прокручиваются внутри себя. */
+  .panel > * { min-width: 0; }
   .field + .field { margin-top: 18px; }
   .field label { display: block; font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
   .field .val {
@@ -212,6 +287,70 @@
   .where ol li { counter-increment: w; position: relative; padding: 0 0 12px 28px; color: var(--dim); font-size: .95rem; }
   .where ol li:last-child { padding-bottom: 0; }
   .where ol li::before { content: counter(w); position: absolute; left: 0; top: 0; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+  /* Поля подключения — как дифф: что было в приложении и что стало. */
+  .connector { --del: #e5736b; }
+  .field .was {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+    padding: 8px 14px; border-radius: 9px;
+    border: 1px solid rgba(229,115,107,.16); background: rgba(229,115,107,.05);
+    font-family: var(--mono); font-size: .86rem; color: var(--muted);
+  }
+  .field .was::before, .field .val::before { font-family: var(--mono); font-size: .92rem; width: 10px; flex: none; }
+  .field .was::before { content: "−"; color: var(--del); }
+  .field .val::before { content: "+"; color: var(--ok); }
+  .field .val { border-color: rgba(62,207,142,.22); }
+  .field .was s { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-decoration-color: rgba(229,115,107,.55); }
+  .field .was small { flex: none; font-size: 11px; color: var(--del); }
+  @media (max-width: 520px) { .field .was small { display: none; } }
+
+  /* ── квота: неделя одной подписки ──────────────────────────────────── */
+  /* Обе строки в одном масштабе: полоса — 100 % недельного лимита, рамка
+     справа — 36 единиц того же масштаба. Так видно, что приложения не
+     появляются из ниоткуда, а переезжают из второго счёта внутрь лимита. */
+  #why h2 .soft { color: var(--muted); }
+  .burn { position: relative; display: grid; gap: 16px; }
+  .burn-head, .burn-row {
+    display: grid; grid-template-columns: 200px minmax(0, 100fr) minmax(0, 36fr);
+    gap: 10px 16px; align-items: center;
+  }
+  .burn-head { font-family: var(--mono); font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .burn-name b { display: block; font-weight: 500; }
+  .burn-name span { display: block; font-size: .88rem; line-height: 1.4; color: var(--muted); }
+  .burn-bar, .burn-out { display: flex; gap: 2px; height: 46px; }
+  .burn-bar { border-radius: 9px; overflow: hidden; }
+  .burn-out { border: 1px dashed var(--line-2); border-radius: 9px; padding: 3px; }
+  .burn-out .seg:first-child { border-radius: 6px 0 0 6px; }
+  .burn-out .seg:last-child { border-radius: 0 6px 6px 0; }
+  .burn-out.none { align-items: center; justify-content: center; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .seg {
+    flex: var(--w) 1 0; min-width: 0; display: flex; align-items: center;
+    font-family: var(--mono); font-size: 11.5px; white-space: nowrap; overflow: hidden;
+  }
+  /* Отступ у подписи, а не у сегмента: иначе узкие доли раздувались бы до ширины отступов. */
+  .seg em { font-style: normal; overflow: hidden; padding: 0 8px; }
+  .seg.term { background: #464e5e; color: var(--fg); }
+  .seg.app { background: var(--accent); color: #0a0b0d; }
+  .seg.lost {
+    background: repeating-linear-gradient(135deg, rgba(224,163,58,.42) 0 2px, transparent 2px 8px), rgba(224,163,58,.07);
+    color: var(--fg);
+  }
+  .burn-legend { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 4px; font-size: .9rem; color: var(--dim); }
+  .burn-legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .burn-legend i { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+  .burn figcaption { margin: 0; max-width: 72ch; font-family: var(--sans); font-size: .9rem; line-height: 1.55; }
+  .burn-tip {
+    position: absolute; z-index: 5; pointer-events: none; transform: translate(-50%, calc(-100% - 12px));
+    padding: 7px 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line-2);
+    font-family: var(--mono); font-size: 12px; color: var(--fg); white-space: nowrap;
+    box-shadow: 0 10px 30px rgba(0,0,0,.5);
+  }
+  @media (max-width: 700px) {
+    .burn-head, .burn-row { grid-template-columns: minmax(0, 100fr) minmax(0, 36fr); }
+    .burn-head span:first-child { display: none; }
+    .burn-head { font-size: 10px; letter-spacing: .04em; }
+    .burn-name { grid-column: 1 / -1; }
+  }
 
   /* ── честный блок и FAQ ────────────────────────────────────────────── */
   .rows { border-top: 1px solid var(--line); }
@@ -288,13 +427,58 @@
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
-      <p class="kicker"><b>Seatkey</b> локальный шлюз · macOS</p>
-      <h1>Вы уже платите за<br>Claude&nbsp;Code, Codex или Cursor.<br><span class="soft">Пусть он работает<br>не только в чате.</span></h1>
-      <p class="big">
-        Seatkey поднимает на вашем компьютере обычный OpenAI-адрес, а за ним стоит
-        тот самый агент, за которого вы уже платите. Вставьте адрес в Obsidian,
-        Open WebUI или свой скрипт — и они заработают.
-      </p>
+      <details class="sx-wire">
+        <summary>
+          <span class="sx-verb">POST</span>
+          <span class="sx-path">/e/default/v1/chat/completions</span>
+          <span class="sx-ok">200 OK</span>
+          <span class="sx-rule" aria-hidden="true"></span>
+          <span class="sx-more">запрос</span>
+        </summary>
+<pre class="sx-pre"><span class="m">POST</span> /e/default/v1/chat/completions
+<span class="h">Host:</span> 127.0.0.1:8899
+<span class="h">Authorization:</span> Bearer sk-seatkey-3f9a41c8e2b7
+<span class="h">Content-Type:</span> application/json
+
+{
+  <span class="k">"model"</span>: <span class="s">"claude-sonnet-5"</span>,
+  <span class="k">"stream"</span>: <span class="n">true</span>,
+  <span class="k">"temperature"</span>: <span class="n">1.2</span>,
+  <span class="k">"messages"</span>: [{
+    <span class="k">"role"</span>: <span class="s">"user"</span>,
+    <span class="k">"content"</span>: <span class="s">"У меня уже есть подписка на Claude Code. Зачем мне Seatkey?"</span>
+  }]
+}
+
+<span class="st">HTTP/1.1 200 OK</span>
+<span class="h">Content-Type:</span> text/event-stream
+<span class="h">X-Seatkey-Ignored:</span> temperature, «революционный», «в 10 раз»</pre>
+        <p class="sx-note">Заголовки настоящие: в X-Seatkey-Ignored шлюз перечисляет то, что принял, но не применил. Ручки temperature у агента нет, а остального нет в тексте ответа.</p>
+      </details>
+
+      <p class="sx-ask">У меня уже есть подписка на Claude Code. Зачем мне Seatkey?</p>
+
+      <div class="sx-answer" id="sx-answer">
+        <h1>Чтобы подписка работала не&nbsp;только в&nbsp;терминале.</h1>
+        <p class="big">
+          Seatkey поднимает на вашем компьютере обычный OpenAI-адрес, а за ним стоит
+          тот самый агент, за которого вы уже платите: Claude&nbsp;Code, Codex или Cursor.
+          Вставьте адрес в Obsidian, Open WebUI или свой скрипт, и они заработают
+          на подписке, без второго счёта.
+        </p>
+      </div>
+
+      <div class="sx-bar" id="sx-bar" hidden>
+        <div class="sx-seg" role="group" aria-label="Как приходит текст">
+          <button type="button" data-mode="smooth" aria-pressed="true">ровно</button>
+          <button type="button" data-mode="cli" aria-pressed="false">как отдаёт CLI</button>
+        </div>
+        <canvas id="sx-strip" aria-hidden="true"></canvas>
+        <span class="sx-stat" id="sx-stat"></span>
+        <button type="button" class="sx-again" id="sx-again">показать сразу</button>
+        <p class="sx-hint" id="sx-hint"></p>
+      </div>
+
       <div class="hero-cta">
         <a class="btn" href="#get">Скачать для macOS</a>
         <a class="btn ghost" href="#connect">Как подключить приложение</a>
@@ -320,22 +504,46 @@
   <div class="wrap">
     <div class="head">
       <p class="kicker">01 — в чём дело</p>
-      <h2 class="lead">За один и тот же ответ<br>вы платите дважды.</h2>
+      <h2 class="lead">Подписка не копится.<br><span class="soft">Что не потрачено до сброса, сгорает.</span></h2>
+      <p class="big lead">Лимит подписки выдаётся на срок: у Claude Code — на пять часов и на неделю, у Codex — на неделю, у Cursor — на месяц. Остаток не переносится. Пока вы не в терминале, оплаченное ждёт сброса, а заметкам и скриптам тем временем нужен «OpenAI API», то есть второй счёт.</p>
     </div>
-    <div class="two">
-      <div class="col">
-        <p class="col-label">как это выглядит сейчас</p>
-        <p>Подписка на Claude Code, Codex или Cursor — фиксированная и уже оплачена. Но живёт она в терминале: в редакторе кода и в консоли.</p>
-        <p>Стоит захотеть ту же модель в заметках, в переводчике или в своём скрипте — и выясняется, что приложениям нужен «OpenAI API». То есть <strong>второй счёт</strong>, где деньги считают по токенам, и счётчик крутится с каждого вопроса.</p>
-        <p>Место в подписке при этом простаивает.</p>
+
+    <figure class="burn" aria-labelledby="burn-cap">
+      <div class="burn-head" aria-hidden="true">
+        <span></span>
+        <span>недельный лимит подписки</span>
+        <span>OpenAI API, по токенам</span>
       </div>
-      <div class="col">
-        <p class="col-label on">как это выглядит с Seatkey</p>
-        <p>Seatkey поднимает на вашем компьютере обычный OpenAI-совместимый адрес и выполняет запросы <strong>тем самым CLI</strong>, который у вас установлен и оплачен.</p>
-        <p>Приложение видит привычный <code>/v1/chat/completions</code> и не догадывается, что за ним стоит агент из терминала. Ключи API не нужны: запрос оплачивает подписка, которая у вас и так есть.</p>
-        <p>Второго счёта не появляется вовсе.</p>
+      <div class="burn-row">
+        <div class="burn-name"><b>Сейчас</b><span>сгорает 62 %, приложения платят по второму счёту</span></div>
+        <div class="burn-bar">
+          <span class="seg term" style="--w:38" data-tip="Терминал: 38 % лимита"><em>терминал</em></span>
+          <span class="seg lost" style="--w:62" data-tip="Сгорит при сбросе: 62 % лимита"><em>сгорит 62 %</em></span>
+        </div>
+        <div class="burn-out">
+          <span class="seg app" style="--w:12" data-tip="Obsidian: по второму счёту"><em>Obsidian</em></span>
+          <span class="seg app" style="--w:10" data-tip="Raycast: по второму счёту"><em>Raycast</em></span>
+          <span class="seg app" style="--w:14" data-tip="Скрипты: по второму счёту"><em>скрипты</em></span>
+        </div>
       </div>
-    </div>
+      <div class="burn-row">
+        <div class="burn-name"><b>С Seatkey</b><span>сгорает 26 %, второго счёта нет</span></div>
+        <div class="burn-bar">
+          <span class="seg term" style="--w:38" data-tip="Терминал: 38 % лимита"><em>терминал</em></span>
+          <span class="seg app" style="--w:12" data-tip="Obsidian: 12 % лимита через Seatkey"><em>Obsidian</em></span>
+          <span class="seg app" style="--w:10" data-tip="Raycast: 10 % лимита через Seatkey"><em>Raycast</em></span>
+          <span class="seg app" style="--w:14" data-tip="Скрипты: 14 % лимита через Seatkey"><em>скрипты</em></span>
+          <span class="seg lost" style="--w:26" data-tip="Сгорит при сбросе: 26 % лимита"><em>сгорит 26 %</em></span>
+        </div>
+        <div class="burn-out none">не нужен</div>
+      </div>
+      <div class="burn-legend">
+        <span><i style="background:#464e5e"></i>терминал</span>
+        <span><i style="background:var(--accent)"></i>ваши приложения: Obsidian, Raycast, скрипты</span>
+        <span><i style="background:repeating-linear-gradient(135deg, rgba(224,163,58,.6) 0 2px, transparent 2px 5px), rgba(224,163,58,.1)"></i>сгорит при сбросе</span>
+      </div>
+      <figcaption id="burn-cap">Пример недели, цифры условные. Свои Seatkey показывает на вкладке агентов: загрузку окна 5 часов и окна 7 дней и время до сброса, как их сообщают Claude Code и Codex. У Cursor окон нет, его объём месячный.</figcaption>
+    </figure>
   </div>
 </section>
 
@@ -344,7 +552,7 @@
     <div class="head">
       <p class="kicker">02 — подключение</p>
       <h2 class="lead">Три поля, и приложение работает.</h2>
-      <p class="big lead">Seatkey выдаёт каждому приложению свой адрес и свой ключ. Дальше — обычная настройка «своего OpenAI-сервера», которая есть почти везде.</p>
+      <p class="big lead">Было — отдельный счёт в OpenAI. Стало — ваша подписка. В приложении меняются три поля, всё остальное остаётся как было. Свой адрес и свой ключ у каждого приложения.</p>
     </div>
 
     <div class="connector">
@@ -353,14 +561,17 @@
         <div>
           <div class="field">
             <label for="f-url">Base URL</label>
+            <div class="was"><s>https://api.openai.com/v1</s></div>
             <div class="val"><span id="f-url"></span><button class="copy" data-copy="f-url">копировать</button></div>
           </div>
           <div class="field">
             <label for="f-key">API-ключ</label>
+            <div class="was"><s>sk-proj-…</s><small>счёт по токенам</small></div>
             <div class="val"><span id="f-key"></span><button class="copy" data-copy="f-key">копировать</button></div>
           </div>
           <div class="field">
             <label for="f-model">Модель</label>
+            <div class="was"><s>gpt-5.1</s></div>
             <div class="val"><span id="f-model"></span><button class="copy" data-copy="f-model">копировать</button></div>
           </div>
         </div>
@@ -739,6 +950,230 @@ answer = client.chat.completions.create(
   const onScroll = () => topBar.classList.toggle('stuck', window.scrollY > 8);
   onScroll();
   addEventListener('scroll', onScroll, { passive: true });
+})();
+
+(() => {
+  // ── квота: подписи, которые не влезают в сегмент, прячутся; значение
+  // остаётся в подсказке и в легенде ────────────────────────────────────
+  const fig = document.querySelector('.burn');
+  if (!fig) return;
+  const tip = document.createElement('div');
+  tip.className = 'burn-tip';
+  tip.hidden = true;
+  fig.append(tip);
+  const fit = () => {
+    for (const seg of fig.querySelectorAll('.seg')) {
+      const em = seg.querySelector('em');
+      em.style.visibility = '';
+      if (em.scrollWidth > em.clientWidth) em.style.visibility = 'hidden';
+    }
+  };
+  new ResizeObserver(fit).observe(fig);
+  fig.addEventListener('pointermove', e => {
+    const seg = e.target.closest('.seg[data-tip]');
+    if (!seg) { tip.hidden = true; return; }
+    const r = fig.getBoundingClientRect();
+    tip.textContent = seg.dataset.tip;
+    tip.style.left = (e.clientX - r.left) + 'px';
+    tip.style.top = (e.clientY - r.top) + 'px';
+    tip.hidden = false;
+  });
+  fig.addEventListener('pointerleave', () => { tip.hidden = true; });
+})();
+
+(() => {
+  // ── герой-ответ: первый экран приходит потоком ──────────────────────
+  // Темп источника — замер Claude Code: пачки по 60–90 символов каждые
+  // 497–586 мс. В режиме «ровно» пачка раздаётся по 25 мс так, чтобы
+  // опустеть к приходу следующей, — как это делает сам Seatkey.
+  const root = document.getElementById('sx-answer');
+  const bar = document.getElementById('sx-bar');
+  if (!root || !bar) return;
+  const stat = document.getElementById('sx-stat');
+  const hint = document.getElementById('sx-hint');
+  const again = document.getElementById('sx-again');
+  const segs = [...bar.querySelectorAll('.sx-seg button')];
+  const cv = document.getElementById('sx-strip');
+  const ctx = cv.getContext('2d');
+  const TICK = 25, WIN = 3000, MAXC = 90, SEEN = 'seatkey.hero.streamed';
+  const HINT = {
+    smooth: 'Claude Code отдаёт текст пачками раз в полсекунды. Seatkey раскладывает их в ровный поток.',
+    cli: 'Так текст приходит от самого CLI: по 60–90 символов раз в полсекунды.',
+  };
+  const html = root.innerHTML;
+  const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+  const nf = (x, d = 0) => x.toLocaleString('ru-RU', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const median = a => {
+    if (!a.length) return null;
+    const s = [...a].sort((x, y) => x - y), m = s.length >> 1;
+    return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+  };
+  const caret = document.createElement('span');
+  caret.id = 'sx-caret';
+  caret.setAttribute('aria-hidden', 'true');
+  let mode = 'smooth', run = null, events = [], raf = 0;
+
+  // Каждый текстовый узел делится на пришедшую часть и невидимый остаток:
+  // строки переносятся так же, как в готовом тексте, и вёрстка не дёргается.
+  function Reveal() {
+    const items = [];
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: n => n.data.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT,
+    });
+    const nodes = [];
+    while (w.nextNode()) nodes.push(w.currentNode);
+    for (const n of nodes) {
+      // Только обычные пробелы и переводы строк: неразрывный пробел остаётся неразрывным.
+      const s = n.data.replace(/[ \t\r\n]+/g, ' ');
+      const rest = document.createElement('span');
+      rest.className = 'sx-rest';
+      rest.textContent = s;
+      n.data = '';
+      n.after(rest);
+      for (let el = n.parentElement; el && el !== root; el = el.parentElement) el.classList.add('sx-pend');
+      items.push({ n, rest, s });
+    }
+    const show = it => { for (let el = it.n.parentElement; el && el !== root; el = el.parentElement) el.classList.remove('sx-pend'); };
+    const total = items.reduce((a, it) => a + it.s.length, 0);
+    let i = 0, off = 0;
+    return {
+      total,
+      prime() { if (items[0]) { show(items[0]); items[0].rest.before(caret); } },
+      take(k) {
+        while (k > 0 && i < items.length) {
+          const it = items[i];
+          if (off === 0) show(it);
+          const t = Math.min(k, it.s.length - off);
+          off += t; k -= t;
+          it.n.data = it.s.slice(0, off);
+          it.rest.textContent = it.s.slice(off);
+          it.rest.before(caret);
+          if (off >= it.s.length) { i++; off = 0; }
+        }
+      },
+    };
+  }
+
+  // Лента чанков за последние 3 секунды: высота штриха — символы в чанке.
+  function size() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = Math.round(cv.clientWidth * dpr);
+    cv.height = Math.round(cv.clientHeight * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function draw() {
+    const now = performance.now(), W = cv.clientWidth, H = cv.clientHeight;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(255,255,255,.16)';
+    ctx.fillRect(0, H - 1, W, 1);
+    events = events.filter(e => now - e.t < WIN);
+    ctx.fillStyle = accent;
+    for (const e of events) {
+      const x = W * (1 - (now - e.t) / WIN);
+      const h = Math.max(2, Math.min(1, e.size / MAXC) * (H - 3));
+      ctx.fillRect(x - .75, H - 1 - h, 1.5, h);
+    }
+    const live = run || events.length;
+    cv.style.opacity = live ? '1' : '.35';
+    raf = live ? requestAnimationFrame(draw) : 0;
+  }
+  const kick = () => { if (!raf) raf = requestAnimationFrame(draw); };
+
+  function play() {
+    if (run) return;
+    root.innerHTML = html;
+    const rv = Reveal();
+    let seed = 7 + rv.total;
+    const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+    const bursts = [];
+    for (let t = 450, left = rv.total; left > 0; t += 497 + rnd() * 89) {
+      const s = Math.min(left, 60 + Math.floor(rnd() * 31));
+      bursts.push({ at: t, size: s });
+      left -= s;
+    }
+    let bi = 0, buf = 0, lastAt = null, sum = 0, cnt = 0, mean = 541, nextExp = 0, last = null;
+    const pauses = { smooth: [], cli: [] };
+    const t0 = performance.now();
+
+    function out(k) {
+      if (k <= 0) return;
+      rv.take(k);
+      const tt = performance.now();
+      if (last != null) pauses[mode].push(tt - last);
+      last = tt;
+      events.push({ t: tt, size: k });
+    }
+    function finish(skipped) {
+      clearInterval(id);
+      run = null;
+      caret.remove();
+      root.removeAttribute('aria-busy');
+      const md = median(pauses[mode]);
+      stat.textContent = skipped ? 'показано сразу'
+        : nf((performance.now() - t0) / 1000, 1) + ' с' + (md == null ? '' : ' · пауза ' + nf(Math.round(md)) + ' мс');
+      again.textContent = 'ещё раз';
+      kick();
+    }
+
+    root.setAttribute('aria-busy', 'true');
+    rv.prime();
+    again.textContent = 'показать сразу';
+    const id = setInterval(() => {
+      const now = performance.now() - t0;
+      while (bi < bursts.length && bursts[bi].at <= now) {
+        const b = bursts[bi++];
+        if (lastAt != null) { sum += b.at - lastAt; cnt++; mean = sum / cnt; }
+        lastAt = b.at;
+        nextExp = b.at + mean;
+        if (mode === 'cli') out(b.size); else buf += b.size;
+      }
+      if (mode === 'smooth' && buf > 0) {
+        const k = Math.min(buf, Math.ceil(buf * TICK / Math.max(TICK, nextExp - now)));
+        buf -= k;
+        out(k);
+      }
+      const md = median(pauses[mode]);
+      stat.textContent = md == null ? 'ждём первый токен' : 'пауза ' + nf(Math.round(md)) + ' мс';
+      if (bi >= bursts.length && buf === 0) finish(false);
+    }, TICK);
+
+    run = {
+      switched() {
+        last = null;
+        if (mode === 'cli' && buf > 0) { const k = buf; buf = 0; out(k); }
+      },
+      skip() { rv.take(rv.total); bi = bursts.length; buf = 0; finish(true); },
+    };
+    kick();
+  }
+
+  function setMode(m) {
+    mode = m;
+    for (const b of segs) b.setAttribute('aria-pressed', String(b.dataset.mode === m));
+    hint.textContent = HINT[m];
+    if (run) run.switched();
+  }
+  // Переключатель на готовом ответе сразу проигрывает его заново в выбранном режиме.
+  for (const b of segs) b.addEventListener('click', () => {
+    if (b.dataset.mode !== mode) setMode(b.dataset.mode);
+    if (!run) play();
+  });
+  again.addEventListener('click', () => (run ? run.skip() : play()));
+
+  bar.hidden = false;
+  hint.textContent = HINT.smooth;
+  new ResizeObserver(() => { size(); kick(); }).observe(cv);
+
+  // Поток — только при первом визите: вернувшемуся читателю нужен текст, а не спектакль.
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let seen = false;
+  try { seen = localStorage.getItem(SEEN) === '1'; } catch { /* хранилище недоступно — считаем визит первым */ }
+  if (reduce || seen) {
+    again.textContent = 'проиграть ответ';
+  } else {
+    try { localStorage.setItem(SEEN, '1'); } catch { /* не страшно: просто проиграем ещё раз */ }
+    play();
+  }
 })();
 </script>
 </body>
