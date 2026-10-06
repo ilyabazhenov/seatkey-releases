@@ -817,10 +817,6 @@
         <dt>One key, one computer</dt>
         <dd>The license is time-limited, tied to the machine and checked offline. Without a key the app runs, but requests to models don't go through.</dd>
       </div>
-      <div class="row">
-        <dt>The first launch takes one extra step</dt>
-        <dd>The build is signed with a self-made certificate, not an Apple Developer ID, so macOS will ask you to confirm the launch once.</dd>
-      </div>
     </dl>
   </div>
 </section>
@@ -902,7 +898,7 @@
       </div>
       <ol class="steps">
         <li><b>Unzip the archive</b> and move Seatkey.app to Applications.</li>
-        <li><b>Open the app.</b> macOS will ask you to confirm the launch: System Settings → Privacy &amp; Security → Open Anyway. Just once.</li>
+        <li><b>Open the app.</b> The build is signed with an Apple Developer ID and notarized by Apple, so macOS opens it right away.</li>
         <li><b>Copy the address</b> of the first endpoint and paste it into your app. The key is right next to it.</li>
       </ol>
     </div>
