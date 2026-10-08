@@ -1,0 +1,56 @@
+<!doctype html><html><head><meta charset="utf-8">
+<meta name="robots" content="noindex">
+<!--
+  Макет картинки для превью репозитория (Settings → General → Social preview).
+  Берёт иконку из assets/icon.png и снимок из shots/app-endpoints.png —
+  обновили снимок, перерисуйте картинку. Из корня репозитория:
+
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
+    --hide-scrollbars --force-device-scale-factor=2 --window-size=1280,640 \
+    --virtual-time-budget=8000 --screenshot="$PWD/assets/social-preview.png" \
+    "file://$PWD/assets/social-preview.html"
+
+  Выйдет 2560×1280; GitHub принимает до 1 МБ. Загружается в настройках вручную.
+-->
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=block" rel="stylesheet">
+<style>
+  :root{--bg:#08090b;--panel:#101318;--fg:#eceef2;--dim:#a2aab8;--muted:#79818f;--accent:#5b8cff;--ok:#3ecf8e}
+  *{margin:0;box-sizing:border-box}
+  html,body{width:1280px;height:640px;overflow:hidden;background:var(--bg)}
+  body{position:relative;font-family:Onest,system-ui,sans-serif;color:var(--fg)}
+  .glow{position:absolute;inset:0;background:
+     radial-gradient(620px 420px at 6% 0%,rgba(91,140,255,.22),transparent 70%),
+     radial-gradient(700px 500px at 92% 110%,rgba(91,140,255,.16),transparent 70%)}
+  .grid{position:absolute;inset:0;opacity:.35;
+     background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+     background-size:40px 40px;mask-image:linear-gradient(90deg,#000 0%,transparent 55%)}
+  .left{position:absolute;left:72px;top:64px;width:540px}
+  .brand{display:flex;align-items:center;gap:22px}
+  .brand img{width:96px;height:96px;filter:drop-shadow(0 10px 24px rgba(0,0,0,.5))}
+  h1{font-size:72px;font-weight:700;letter-spacing:-.02em;line-height:1}
+  .tag{margin-top:34px;font-size:40px;font-weight:600;letter-spacing:-.015em;line-height:1.1}
+  .tag b{color:var(--accent);font-weight:600}
+  .desc{margin-top:18px;font-size:24px;line-height:1.38;color:var(--dim)}
+  .chips{margin-top:30px;display:flex;flex-wrap:wrap;gap:10px}
+  .chip{font:500 18px/1 "JetBrains Mono",monospace;color:#cfd6e4;padding:10px 14px;border-radius:10px;
+        background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09)}
+  .chip i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:9px;vertical-align:1px}
+  .foot{position:absolute;left:72px;bottom:56px;display:flex;gap:18px;align-items:center;
+        font:500 20px/1 "JetBrains Mono",monospace;color:var(--muted)}
+  .foot .url{color:var(--fg)}
+  .shot{position:absolute;left:660px;top:92px;width:900px;border-radius:16px;overflow:hidden;
+        border:1px solid rgba(255,255,255,.12);
+        box-shadow:0 40px 90px rgba(0,0,0,.65),0 0 0 8px rgba(255,255,255,.025)}
+  .shot img{display:block;width:100%}
+  .shot::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 70%,rgba(8,9,11,.55))}
+</style></head><body>
+<div class="glow"></div><div class="grid"></div>
+<div class="shot"><img src="../shots/app-endpoints.png"></div>
+<div class="left">
+  <div class="brand"><img src="icon.png"><h1>Seatkey</h1></div>
+  <div class="tag">Your seat is <b>your key.</b></div>
+  <div class="desc">A local OpenAI-compatible API over the agent subscriptions you already pay&nbsp;for.</div>
+  <div class="chips"><span class="chip"><i></i>Claude Code</span><span class="chip"><i></i>Codex CLI</span><span class="chip"><i></i>Cursor Agent</span></div>
+</div>
+<div class="foot"><span class="url">seatkey.dev</span><span>·</span><span>macOS</span></div>
+</body></html>
