@@ -1,0 +1,67 @@
+name: Ошибка / Bug report
+description: Что-то работает не так / Something doesn't work as it should
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Issue публичные. Не вставляйте сюда ключи, токены и тексты, которые не хотите показывать.
+        Issues are public. Don't paste keys, tokens or texts you don't want to share.
+  - type: input
+    id: version
+    attributes:
+      label: Версия Seatkey / Seatkey version
+      description: Внизу бокового меню или Settings → App / Bottom of the sidebar or Settings → App
+      placeholder: "0.10.0"
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: Версия macOS и Mac / macOS version and Mac
+      placeholder: "macOS 26.1, MacBook Air M2"
+    validations:
+      required: true
+  - type: dropdown
+    id: backend
+    attributes:
+      label: Что стоит за точкой / What's behind the endpoint
+      multiple: true
+      options:
+        - Claude Code
+        - Codex CLI
+        - Cursor Agent
+        - OpenAI-совместимый провайдер / OpenAI-compatible provider
+        - HTTP-сервис / HTTP service
+        - Не про точку / Not endpoint-related
+    validations:
+      required: true
+  - type: input
+    id: client
+    attributes:
+      label: Клиент / Client app
+      description: Откуда шёл запрос / Where the request came from
+      placeholder: "Open WebUI, Obsidian, curl…"
+  - type: textarea
+    id: steps
+    attributes:
+      label: Что делали / Steps
+      placeholder: |
+        1. …
+        2. …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Что ожидали и что получилось / Expected and actual result
+      description: Текст ошибки из журнала запросов очень помогает / The error text from the request log helps a lot
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: Отчёт о проблеме / Problem report
+      description: |
+        Settings → Doctor → «Отчёт о проблеме» → «Сохранить файл…». Просмотрите его и перетащите сюда. Ключей в нём нет, промтов — только если вы отметили галочку.
+        Settings → Doctor → «Отчёт о проблеме» → «Сохранить файл…». Review it, then drag it here. It contains no keys, and prompts only if you ticked the box.

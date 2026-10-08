@@ -1,0 +1,29 @@
+name: Прошу ключ / License key request
+description: Ключ для своего компьютера / A key for your computer
+title: "Прошу ключ"
+labels: [license]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ключ привязан к одному компьютеру. Отпечаток — хеш идентификатора установки системы: ничего о вас он не сообщает, его можно показывать. Сам ключ, когда придёт, никуда не публикуйте.
+        The key is bound to one computer. The fingerprint is a hash of the OS installation ID and reveals nothing about you, so it's safe to share. Don't publish the key itself once you get it.
+  - type: input
+    id: fingerprint
+    attributes:
+      label: Отпечаток компьютера / Machine fingerprint
+      description: Settings → License, или `seatkey license` в терминале / or `seatkey license` in a terminal
+      placeholder: "SK-XXXX-XXXX-XXXX"
+    validations:
+      required: true
+  - type: textarea
+    id: contact
+    attributes:
+      label: Как с вами связаться / How to reach you
+      description: Если удобнее не здесь — почта или Telegram / If not here — email or Telegram
+  - type: textarea
+    id: usage
+    attributes:
+      label: Для чего / What for
+      description: Необязательно — но помогает понять, что делать дальше / Optional, but helps decide what to build next
+      placeholder: "Obsidian и Open WebUI поверх Claude Code…"
